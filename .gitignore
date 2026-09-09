@@ -19,6 +19,9 @@ ENV/
 *.sqlite
 *.sqlite3
 
+# Alembic migrations regenerated fresh by sqlmodel13.py on every run
+src/sqlmodel/migrations_demo/alembic/versions/*.py
+
 # Distribution / packaging
 build/
 dist/

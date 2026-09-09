@@ -3,7 +3,6 @@ from typing import Optional
 
 from sqlmodel import Field, Relationship, Session, SQLModel, col, create_engine, select
 
-
 # Many-to-many + Joins
 # Many-to-many: heroes ↔ tags via a link/junction table.
 # Joins: query across two tables in one select (hero + team in one query).
@@ -16,6 +15,7 @@ engine = create_engine(f"sqlite:///{db_file}", echo=False)
 
 
 # Many-to-many — needs a link table (association table) with FKs to both sides.
+
 
 class HeroTagLink(SQLModel, table=True):
     hero_id: int | None = Field(default=None, foreign_key="hero.id", primary_key=True)
@@ -94,9 +94,7 @@ with Session(engine) as session:
 
 with Session(engine) as session:
     results = session.exec(
-        select(Hero, Team)
-        .join(Team)
-        .where(Team.name == "Avengers")
+        select(Hero, Team).join(Team).where(Team.name == "Avengers")
     ).all()
 
     print("JOIN — heroes in Avengers:")
@@ -152,3 +150,5 @@ with Session(engine) as session:
 #   select(A, B).join(B).where(...)  → SQL JOIN, returns (A, B) tuples
 #   use joins for filtered lists across tables
 #   use Relationship for convenient object navigation (watch N+1 in APIs)
+
+print("\n→ Continue with sqlmodel11.py for Decimal numbers and UUID primary keys")

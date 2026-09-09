@@ -14,3 +14,12 @@ httpx>=0.27.0
 pydantic-settings>=2.0.0
 aiosqlite>=0.20.0
 greenlet>=3.0.0
+
+# Schema migrations (sqlmodel13.py)
+alembic>=1.13.0
+
+# FastAPI notes folder (fastapi1.py-fastapi13.py)
+python-multipart>=0.0.9  # form data + file uploads, OAuth2PasswordRequestForm
+pyjwt>=2.8.0             # JWT encode/decode (fastapi10.py)
+pwdlib[argon2]>=0.2.0    # password hashing (fastapi10.py)
+websockets>=12.0         # websocket support for uvicorn + fastapi11.py

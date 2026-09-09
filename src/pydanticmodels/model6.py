@@ -3,7 +3,6 @@ from typing import Annotated, Literal
 
 from pydantic import BaseModel, Field, field_serializer, model_serializer
 
-
 # field_serializer — customize how one field is converted to JSON/dict on output.
 # Runs during model_dump() / model_dump_json(), NOT during validation (input).
 #
@@ -11,6 +10,7 @@ from pydantic import BaseModel, Field, field_serializer, model_serializer
 #   - format dates, decimals, enums for API output
 #   - hide/transform sensitive values
 #   - convert list → string (or other output shape)
+
 
 class Book(BaseModel):
     title: str
@@ -63,13 +63,16 @@ print("model_serializer — custom keys:", user.model_dump())
 # Without discriminator, Pydantic may try the wrong model first and give confusing errors.
 # With discriminator, it reads the tag field and validates against exactly one model.
 
+
 class Cat(BaseModel):
     pet_type: Literal["cat"]
     meows: int
 
+
 class Dog(BaseModel):
     pet_type: Literal["dog"]
     barks: float
+
 
 class Bird(BaseModel):
     pet_type: Literal["bird"]
@@ -84,16 +87,20 @@ class PetOwner(BaseModel):
     ]
 
 
-owner1 = PetOwner.model_validate({
-    "name": "Indra",
-    "pet": {"pet_type": "cat", "meows": 5},
-})
+owner1 = PetOwner.model_validate(
+    {
+        "name": "Indra",
+        "pet": {"pet_type": "cat", "meows": 5},
+    }
+)
 print(f"DISCRIMINATED — {owner1.name}'s pet: {owner1.pet}")
 
-owner2 = PetOwner.model_validate({
-    "name": "Ray",
-    "pet": {"pet_type": "dog", "barks": 3.5},
-})
+owner2 = PetOwner.model_validate(
+    {
+        "name": "Ray",
+        "pet": {"pet_type": "dog", "barks": 3.5},
+    }
+)
 print(f"DISCRIMINATED — {owner2.name}'s pet: {owner2.pet}")
 
 # PetOwner.model_validate({
@@ -104,9 +111,11 @@ print(f"DISCRIMINATED — {owner2.name}'s pet: {owner2.pet}")
 
 # Nested discriminated union — payment methods in checkout APIs.
 
+
 class CardPayment(BaseModel):
     method: Literal["card"]
     card_number: str
+
 
 class UpiPayment(BaseModel):
     method: Literal["upi"]
@@ -121,10 +130,12 @@ class Checkout(BaseModel):
     ]
 
 
-checkout = Checkout.model_validate({
-    "amount": 999.0,
-    "payment": {"method": "upi", "upi_id": "user@upi"},
-})
+checkout = Checkout.model_validate(
+    {
+        "amount": 999.0,
+        "payment": {"method": "upi", "upi_id": "user@upi"},
+    }
+)
 print(f"CHECKOUT — {checkout.payment.method}: {checkout.payment.upi_id}")
 
 
@@ -137,3 +148,7 @@ print(f"CHECKOUT — {checkout.payment.method}: {checkout.payment.upi_id}")
 # Discriminated union → Annotated[A | B | C, Field(discriminator="type_field")]
 # Each variant must have a unique Literal value on the discriminator field
 # Essential for polymorphic JSON (events, payments, notifications, webhooks)
+#
+# Continue in model7.py for Pydantic Settings (BaseSettings) — reading typed
+# config from environment variables, .env files, and secrets. Then model8.py for
+# computed_field, SecretStr/SecretBytes, and TypeAdapter.

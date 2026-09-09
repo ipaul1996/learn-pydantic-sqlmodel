@@ -3,7 +3,6 @@ from typing import Optional
 
 from sqlmodel import Field, Relationship, Session, SQLModel, col, create_engine, select
 
-
 # Relationships (core)
 # Connect tables via foreign keys + Relationship().
 # Example: one Team → many Heroes (one-to-many), each Hero → one Team (many-to-one).
@@ -14,12 +13,16 @@ from sqlmodel import Field, Relationship, Session, SQLModel, col, create_engine,
 #   - Or split models but import only under if TYPE_CHECKING for type hints
 
 db_file = Path(__file__).parent / "database_relationships.db"
+db_file.unlink(
+    missing_ok=True
+)  # reset for repeatable runs (same pattern as sqlmodel7.py/8.py)
 engine = create_engine(f"sqlite:///{db_file}", echo=False)
 
 
 # Many-to-one side — Hero belongs to one Team.
 # team_id is the foreign key column stored in the hero table.
 # team is the Python Relationship attribute (not a DB column).
+
 
 class Hero(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
@@ -31,12 +34,13 @@ class Hero(SQLModel, table=True):
 # One-to-many side — Team has many Heroes.
 # heroes is a list Relationship; no extra column on team table.
 
+
 class Team(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
     name: str
     heroes: list[Hero] = Relationship(
         back_populates="team",
-        cascade_delete=True,   # deleting a team also deletes its heroes
+        cascade_delete=True,  # deleting a team also deletes its heroes
     )
 
 
@@ -59,7 +63,9 @@ with Session(engine) as session:
     session.add(avengers)
     session.commit()
     session.refresh(avengers)
-    print(f"CREATE together — team: {avengers.name}, heroes: {[h.name for h in avengers.heroes]}")
+    print(
+        f"CREATE together — team: {avengers.name}, heroes: {[h.name for h in avengers.heroes]}"
+    )
 
 
 # Optional relationship — hero without a team (team_id=None).
@@ -68,7 +74,7 @@ with Session(engine) as session:
     session.add(loner)
     session.commit()
     session.refresh(loner)
-    print(f"OPTIONAL — hero: {loner.name}, team: {loner.team}")   # team is None
+    print(f"OPTIONAL — hero: {loner.name}, team: {loner.team}")  # team is None
 
 
 # Link existing hero to existing team via foreign key.
@@ -117,7 +123,7 @@ with Session(engine) as session:
     session.commit()
 
     remaining = session.exec(select(Hero).where(col(Hero.name).in_(hero_names))).all()
-    print(f"CASCADE — heroes after team delete: {remaining}")   # [] — heroes removed too
+    print(f"CASCADE — heroes after team delete: {remaining}")  # [] — heroes removed too
 
 
 # Without cascade_delete, deleting a team would leave heroes with dangling team_id.
