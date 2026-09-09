@@ -136,7 +136,9 @@ checkout = Checkout.model_validate(
         "payment": {"method": "upi", "upi_id": "user@upi"},
     }
 )
-print(f"CHECKOUT — {checkout.payment.method}: {checkout.payment.upi_id}")
+
+if isinstance(checkout.payment, UpiPayment):
+    print(f"CHECKOUT — {checkout.payment.method}: {checkout.payment.upi_id}")
 
 
 # Summary

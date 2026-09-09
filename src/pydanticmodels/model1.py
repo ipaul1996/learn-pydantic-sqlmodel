@@ -35,9 +35,7 @@ class Person(BaseModel):
 
 # Nested dict is accepted — Pydantic converts it into an Address instance.
 person = Person(
-    name="Indra",
-    age=25,
-    address={"city": "Bangalore"}
+    name="Indra", age=25, address={"city": "Bangalore"}  # type: ignore[arg-type]
 )
 print(person.__dict__)   # raw internal dict (includes nested Address object)
 print(person.model_dump())  # clean dict: {'name': '...', 'age': 25, 'address': {'city': '...'}}
@@ -103,7 +101,6 @@ print(user3.model_dump(exclude={"password"}))
 # include={"name", "age"}  → only include listed fields (whitelist)
 print(user3.model_dump(include={"name", "age"}))
 # {'name': 'John', 'age': None}
-
 
 
 # Validation vs serialization pipeline

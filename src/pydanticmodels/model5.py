@@ -1,10 +1,10 @@
 from typing import Literal
 from pydantic import BaseModel, EmailStr, HttpUrl, PositiveInt, Field
 
-
 # Common Pydantic types — built-in validated types, better than hand-rolled checks.
 # EmailStr, HttpUrl, PositiveInt, etc. are Annotated types with validation baked in.
 # EmailStr requires: pip install email-validator  (or pydantic[email])
+
 
 class Contact(BaseModel):
     email: EmailStr
@@ -14,7 +14,7 @@ class Contact(BaseModel):
 
 contact = Contact(
     email="ip@gmail.com",
-    website="https://example.com",
+    website="https://example.com",  # pyright: ignore[reportArgumentType]
     score=10,
 )
 print(contact)
@@ -25,6 +25,7 @@ print(contact)
 
 
 # Literal — field must be one of the listed exact values (great for enums/status fields).
+
 
 class Order(BaseModel):
     status: Literal["pending", "shipped", "delivered"]
@@ -39,9 +40,10 @@ print(order)
 
 # Union (|) — field can be one of several types. Pydantic tries to match the correct type.
 
+
 class Payment(BaseModel):
     amount: float
-    reference: str | int   # accepts "ABC123" or 12345
+    reference: str | int  # accepts "ABC123" or 12345
 
 
 pay1 = Payment(amount=99.0, reference="ABC123")
@@ -51,9 +53,11 @@ print(pay1, pay2)
 
 # Union of models — different shapes of input for the same field.
 
+
 class CreditCard(BaseModel):
     type: Literal["card"] = "card"
     card_number: str
+
 
 class UPI(BaseModel):
     type: Literal["upi"] = "upi"
@@ -64,13 +68,21 @@ class Checkout(BaseModel):
     method: CreditCard | UPI
 
 
-checkout1 = Checkout(method={"type": "card", "card_number": "4111111111111111"})
-checkout2 = Checkout(method={"type": "upi", "upi_id": "user@upi"})
+checkout1 = Checkout(
+    method={
+        "type": "card",
+        "card_number": "4111111111111111",
+    }  # pyright: ignore[reportArgumentType]
+)
+checkout2 = Checkout(
+    method={"type": "upi", "upi_id": "user@upi"}  # pyright: ignore[reportArgumentType]
+)
 print(checkout1.method)
 print(checkout2.method)
 
 
 # Collections — list[...] and dict[...] fields. Pydantic validates each item/key/value.
+
 
 class Tag(BaseModel):
     name: str
@@ -78,22 +90,28 @@ class Tag(BaseModel):
 
 class Article(BaseModel):
     title: str
-    tags: list[str]                          # list of strings
-    tag_objects: list[Tag]                   # list of nested models
-    metadata: dict[str, str]                 # string keys and string values
+    tags: list[str]  # list of strings
+    tag_objects: list[Tag]  # list of nested models
+    metadata: dict[str, str]  # string keys and string values
     ratings: dict[str, PositiveInt] = Field(default_factory=dict)
 
 
 # tuple input is coerced to list when field type is list[...]
 article = Article(
     title="Learning Pydantic",
-    tags=("python", "pydantic"),             # tuple → list[str]
-    tag_objects=[{"name": "backend"}, {"name": "validation"}],
+    tags=(
+        "python",
+        "pydantic",
+    ),  # tuple → list[str]  # pyright: ignore[reportArgumentType]
+    tag_objects=[
+        {"name": "backend"},
+        {"name": "validation"},
+    ],  # pyright: ignore[reportArgumentType]
     metadata={"author": "Indra", "level": "beginner"},
     ratings={"quality": 5, "clarity": 4},
 )
-print(article.tags)                         # ['python', 'pydantic']
-print(article.tag_objects[0].name)          # backend
+print(article.tags)  # ['python', 'pydantic']
+print(article.tag_objects[0].name)  # backend
 print(article.model_dump())
 
 # Article(title="X", tags="not-a-list", metadata={})  # ValidationError
