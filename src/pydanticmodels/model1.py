@@ -1,5 +1,18 @@
 from pydantic import BaseModel
 
+"""
+
+Let's see how this three-stage lifecycle looks in actual Python code. Notice how perfectly it matches 
+our mental model:
+
+- The Contract: You subclass BaseModel and use standard Python type hints to set your rules.
+- Ingestion: Methods like model_validate() and model_validate_json() take messy input (like a string) 
+  and safely convert it into the exact type you need (like an integer).
+- Serialization: You use model_dump() to filter your safe internal data and package it back into a 
+  clean dictionary to send out.
+
+"""
+
 # Basics: BaseModel + constructor
 # BaseModel turns a class into a validated data container.
 # Fields with type hints define what data is allowed.
