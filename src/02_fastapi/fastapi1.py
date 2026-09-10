@@ -1,3 +1,7 @@
+# Docs Link: https://fastapi.tiangolo.com/learn/
+
+# ====================================================================================
+
 from enum import Enum
 
 from fastapi import FastAPI

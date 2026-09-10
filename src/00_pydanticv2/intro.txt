@@ -1,3 +1,7 @@
+Docs Link: https://pydantic.dev/docs/validation/latest/get-started/
+
+=====================================================================================================================
+
 Forget the old way of writing endless if/else checks to sanitize data. Pydantic is not just a validation 
 library; it is a parsing engine.
 
